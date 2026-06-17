@@ -1,0 +1,942 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Claudia Chen | 個人電子名片</title>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #f7f7f7;
+      --surface: rgba(255, 255, 255, 0.82);
+      --surface-strong: #ffffff;
+      --text: #101010;
+      --text-muted: #5f6a7a;
+      --accent: #0071e3;
+      --accent-soft: rgba(0, 113, 227, 0.16);
+      --border: rgba(16, 16, 16, 0.08);
+      --shadow: 0 30px 90px rgba(15, 23, 42, 0.08);
+      --hero: linear-gradient(180deg, rgba(255,255,255,0.78), rgba(255,255,255,0.4));
+    }
+
+    html,
+    body {
+      margin: 0;
+      min-height: 100%;
+      background: radial-gradient(circle at top left, rgba(0, 113, 227, 0.24), transparent 32%),
+        radial-gradient(circle at bottom right, rgba(10, 22, 81, 0.23), transparent 28%),
+        var(--bg);
+      color: var(--text);
+      font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      scroll-behavior: smooth;
+    }
+
+    body.dark {
+      color-scheme: dark;
+      --bg: #090c13;
+      --surface: rgba(14, 19, 32, 0.84);
+      --surface-strong: rgba(9, 12, 19, 0.96);
+      --text: #f2f4f8;
+      --text-muted: #b0bacd;
+      --accent: #5ac8fa;
+      --accent-soft: rgba(90, 200, 250, 0.14);
+      --border: rgba(255, 255, 255, 0.08);
+      --shadow: 0 30px 90px rgba(0, 0, 0, 0.32);
+      --hero: linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.01));
+      background: radial-gradient(circle at top left, rgba(90, 200, 250, 0.12), transparent 28%),
+        radial-gradient(circle at bottom right, rgba(149, 94, 255, 0.12), transparent 26%),
+        var(--bg);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    button,
+    a {
+      font: inherit;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .page-shell {
+      max-width: 1240px;
+      margin: 0 auto;
+      padding: 32px 28px 64px;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 48px;
+      padding: 18px 26px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 28px;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(22px);
+    }
+
+    .brand {
+      display: grid;
+      gap: 6px;
+    }
+
+    .brand-label {
+      font-size: 1.05rem;
+      font-weight: 800;
+      letter-spacing: 0.1em;
+    }
+
+    .brand-sub {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+    }
+
+    .controls {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .switch-group {
+      display: inline-flex;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      background: var(--surface);
+    }
+
+    .lang-btn {
+      border: none;
+      background: transparent;
+      color: var(--text);
+      padding: 10px 14px;
+      cursor: pointer;
+      transition: transform 0.3s ease, background 0.3s ease;
+    }
+
+    .lang-btn.active,
+    .lang-btn:hover {
+      background: var(--accent-soft);
+      transform: translateY(-1px);
+    }
+
+    .theme-btn {
+      border: none;
+      border-radius: 16px;
+      padding: 10px 14px;
+      background: var(--surface);
+      color: var(--text);
+      cursor: pointer;
+      box-shadow: 0 18px 40px rgba(0, 0, 0, 0.08);
+    }
+
+    .section {
+      margin-bottom: 64px;
+    }
+
+    .section-header {
+      display: grid;
+      gap: 14px;
+      max-width: 720px;
+    }
+
+    .section-label {
+      display: inline-flex;
+      align-items: center;
+      border-radius: 999px;
+      padding: 6px 14px;
+      font-size: 0.85rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      background: var(--accent-soft);
+      color: var(--accent);
+      width: fit-content;
+    }
+
+    .section-header h2 {
+      font-size: clamp(2rem, 2.8vw, 3.2rem);
+      line-height: 1.02;
+      margin: 0;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1.1fr) minmax(320px, 0.9fr);
+      gap: 40px;
+      align-items: center;
+    }
+
+    .hero-copy {
+      display: grid;
+      gap: 22px;
+    }
+
+    .eyebrow {
+      font-size: 0.95rem;
+      letter-spacing: 0.16em;
+      color: var(--accent);
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .hero-title {
+      font-size: clamp(3rem, 5vw, 4.8rem);
+      line-height: 0.96;
+      margin: 0;
+    }
+
+    .hero-emphasis {
+      display: block;
+      color: var(--accent);
+    }
+
+    .hero-subtitle {
+      max-width: 720px;
+      font-size: 1.1rem;
+      color: var(--text-muted);
+      line-height: 1.8;
+    }
+
+    .hero-actions {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      border: none;
+      border-radius: 999px;
+      padding: 14px 24px;
+      cursor: pointer;
+      transition: transform 0.28s ease, box-shadow 0.28s ease, background 0.28s ease;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+    }
+
+    .primary {
+      background: var(--accent);
+      color: #ffffff;
+      box-shadow: 0 18px 40px rgba(0, 113, 227, 0.26);
+    }
+
+    .secondary {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text);
+    }
+
+    .hero-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .hero-tags span {
+      padding: 10px 14px;
+      border-radius: 999px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      font-size: 0.95rem;
+    }
+
+    .hero-visual {
+      min-height: 520px;
+      display: grid;
+      place-items: center;
+    }
+
+    .visual-frame {
+      position: relative;
+      width: min(100%, 460px);
+      padding: 32px;
+      border-radius: 46px;
+      background: var(--surface-strong);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      backdrop-filter: blur(28px);
+    }
+
+    .visual-glow {
+      position: absolute;
+      top: -50px;
+      right: -90px;
+      width: 280px;
+      height: 280px;
+      background: radial-gradient(circle, rgba(90, 200, 250, 0.35), transparent 65%);
+      filter: blur(20px);
+    }
+
+    .avatar-card {
+      position: relative;
+      overflow: hidden;
+      border-radius: 36px;
+      padding: 24px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.8), rgba(255,255,255,0.4));
+      border: 1px solid rgba(255, 255, 255, 0.24);
+    }
+
+    .avatar-ring {
+      position: absolute;
+      right: -40px;
+      top: -40px;
+      width: 180px;
+      height: 180px;
+      border: 5px solid rgba(90, 200, 250, 0.45);
+      border-radius: 50%;
+    }
+
+    .avatar-image {
+      width: 100%;
+      height: 300px;
+      border-radius: 30px;
+      background: radial-gradient(circle at center, #fafafa 0%, #d6e3f6 25%, #b8cce2 60%, #7a8fbf 100%);
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.12);
+      background-image: url('https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=900&q=80');
+      background-size: cover;
+      background-positiolinear-gradient(135deg, #667eea 0%, #764ba2 100%)
+    .avatar-info {
+      margin-top: 22px;
+      display: grid;
+      gap: 6px;
+    }
+
+    .avatar-info h2 {
+      margin: 0;
+      font-size: 1.8rem;
+    }
+
+    .avatar-info p {
+      margin: 0;
+      color: var(--text-muted);
+    }
+
+    .hero-metrics {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 16px;
+      margin-top: 30px;
+    }
+
+    .hero-metrics div {
+      padding: 18px 20px;
+      border-radius: 24px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      text-align: center;
+    }
+
+    .hero-metrics strong {
+      display: block;
+      font-size: 1.7rem;
+    }
+
+    .hero-metrics span {
+      color: var(--text-muted);
+      display: block;
+      margin-top: 6px;
+    }
+
+    .about-grid,
+    .showcase-grid,
+    .contact-cards {
+      display: grid;
+      gap: 22px;
+    }
+
+    .about-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      margin-top: 32px;
+    }
+
+    .about-card,
+    .showcase-card,
+    .contact-card,
+    .newsletter-card {
+      padding: 28px;
+      border-radius: 32px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      box-shadow: 0 30px 80px rgba(0, 0, 0, 0.05);
+    }
+
+    .about-card h3,
+    .showcase-card h3,
+    .contact-card h3,
+    .newsletter-card h3 {
+      margin-top: 0;
+      margin-bottom: 12px;
+    }
+
+    .about-card p,
+    .showcase-card p,
+    .contact-card a,
+    .newsletter-card p {
+      color: var(--text-muted);
+      line-height: 1.75;
+    }
+
+    .timeline {
+      display: grid;
+      gap: 18px;
+      margin-top: 36px;
+    }
+
+    .timeline-item {
+      display: grid;
+      gap: 10px;
+      align-items: flex-start;
+      padding: 22px 24px;
+      border-radius: 28px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+    }
+
+    .timeline-year {
+      font-size: 1rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--accent);
+    }
+
+    .showcase-section {
+      display: grid;
+      grid-template-columns: 1fr 1.1fr;
+      gap: 40px;
+      align-items: start;
+    }
+
+    .showcase-info p {
+      color: var(--text-muted);
+      font-size: 1rem;
+      line-height: 1.9;
+    }
+
+    .showcase-grid {
+      grid-template-columns: repeat(1, minmax(0, 1fr));
+    }
+
+    .showcase-card {
+      min-height: 180px;
+    }
+
+    .contact-section {
+      display: grid;
+      grid-template-columns: 1.2fr 0.8fr;
+      gap: 32px;
+    }
+
+    .contact-panel {
+      display: grid;
+      gap: 24px;
+    }
+
+    .contact-cards {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .contact-card a {
+      color: var(--text);
+      word-break: break-all;
+    }
+
+    .social-links {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .social-links a {
+      color: var(--accent);
+    }
+
+    .newsletter-card {
+      display: grid;
+      gap: 16px;
+      justify-content: stretch;
+    }
+
+    .newsletter-form {
+      display: grid;
+      gap: 14px;
+    }
+
+    .newsletter-form input {
+      width: 100%;
+      padding: 16px 18px;
+      border-radius: 20px;
+      border: 1px solid var(--border);
+      background: var(--surface-strong);
+      color: var(--text);
+    }
+
+    .newsletter-form input::placeholder {
+      color: var(--text-muted);
+    }
+
+    .animate-item {
+      opacity: 0;
+      transform: translateY(24px);
+      animation: slideInUp 0.8s ease-out forwards;
+    }
+
+    @keyframes slideInUp {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .animate-item:nth-child(1) { animation-delay: 0.1s; }
+    .animate-item:nth-child(2) { animation-delay: 0.2s; }
+    .animate-item:nth-child(3) { animation-delay: 0.3s; }
+    .animate-item:nth-child(4) { animation-delay: 0.4s; }
+    .animate-item:nth-child(5) { animation-delay: 0.5s; }
+
+    @media (max-width: 1024px) {
+      .hero {
+        grid-template-columns: 1fr;
+      }
+
+      .hero-visual {
+        min-height: auto;
+      }
+
+      .showcase-section,
+      .contact-section {
+        grid-template-columns: 1fr;
+      }
+
+      .contact-cards {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .page-shell {
+        padding: 22px 18px 48px;
+      }
+
+      .topbar {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .hero-title {
+        font-size: clamp(2.5rem, 10vw, 3.6rem);
+      }
+
+      .hero-actions {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .hero-metrics {
+        grid-template-columns: 1fr;
+      }
+
+      .about-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page-shell">
+    <header class="topbar animate-item">
+      <div class="brand">
+        <span class="brand-label">H.T.C.</span>
+        <span class="brand-sub">研究所專案經理 × 國際事務協調員</span>
+      </div>
+      <div class="controls">
+        <div class="switch-group">
+          <button class="lang-btn active" data-lang="zh">繁體</button>
+          <button class="lang-btn" data-lang="en">EN</button>
+        </div>
+        <button id="themeToggle" class="theme-btn" aria-label="Toggle theme">☀️</button>
+      </div>
+    </header>
+
+    <main>
+      <section class="hero section hero-section">
+        <div class="hero-copy animate-item">
+          <p class="eyebrow" data-i18n="heroEyebrow">Hello, I'm</p>
+          <h1 class="hero-title">
+            陳筱婷 <span class="hero-emphasis">Claudia Chen</span>
+          </h1>
+          <p class="hero-subtitle" data-i18n="heroSubtitle">研究所與國際事務協調專員</p>
+          <div class="hero-actions">
+            <a href="#contact" class="btn primary" data-i18n="heroAction1">立即聯絡</a>
+            <a href="#about" class="btn secondary" data-i18n="heroAction2">探索更多</a>
+          </div>
+          <div class="hero-tags">
+            <span>專案管理</span>
+            <span>國際協調</span>
+            <span>跨文化溝通</span>
+            <span>學術運營</span>
+          </div>
+        </div>
+        <div class="hero-visual animate-item">
+          <div class="visual-frame">
+            <div class="visual-glow"></div>
+            <div class="avatar-card">
+              <div class="avatar-ring"></div>
+              <div class="avatar-image"></div>
+              <div class="avatar-info">
+                <h2>陳筱婷</h2>
+                <p>Graduate Program manager</p>
+                <p>International affairs specialist</p>
+              </div>
+            </div>
+            <div class="hero-metrics">
+              <div>
+                <strong>9</strong>
+                <span data-i18n="heroMetric1">年教育運營經驗</span>
+              </div>
+              <div>
+                <strong>120+</strong>
+                <span data-i18n="heroMetric2">項國際合作專案</span>
+              </div>
+              <div>
+                <strong>40+</strong>
+                <span data-i18n="heroMetric3">所合作海外大學</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="about" class="section about-section animate-item">
+        <div class="section-header">
+          <span class="section-label" data-i18n="aboutLabel">關於我</span>
+          <h2 data-i18n="aboutTitle">在全球化時代，領導教育卓越與國際交流</h2>
+        </div>
+        <div class="about-grid">
+          <article class="about-card">
+            <h3 data-i18n="aboutCard1Title">核心價值</h3>
+            <p data-i18n="aboutCard1Text">透過有效的專案規劃與國際協調，打造橋樑連接不同文化與學術體系，創造包容且具有全球視野的教育生態。</p>
+          </article>
+          <article class="about-card">
+            <h3 data-i18n="aboutCard2Title">專業技能</h3>
+            <p data-i18n="aboutCard2Text">精通研究所招生與教學計畫管理、國際交流協議簽訂、跨領域團隊溝通，以及複雜專案時程控管與風險預防。</p>
+          </article>
+          <article class="about-card">
+            <h3 data-i18n="aboutCard3Title">今日靈感</h3>
+            <p data-i18n="aboutCard3Text">以聯合國永續發展目標、國際高等教育倫理、與新興市場學術合作為靈感，推動具有社會影響力的教育創新。</p>
+          </article>
+        </div>
+        <div class="timeline">
+          <div class="timeline-item">
+            <span class="timeline-year">2019</span>
+            <p data-i18n="timeline1">獲得教育部國際合作獎，主持校院級研究所國際招生專案，拓展海外學生來源國家至 15 個。</p>
+          </div>
+          <div class="timeline-item">
+            <span class="timeline-year">2021</span>
+            <p data-i18n="timeline2">協調簽署 8 份國際雙學位協議，成功推動 45 名學生進行跨境交流，受到 QS 世界大學排名表揚。</p>
+          </div>
+          <div class="timeline-item">
+            <span class="timeline-year">2024</span>
+            <p data-i18n="timeline3">主導校級國際事務改革計畫，導入數位化簽核與 AI 智能配對系統，效率提升 60%，成為業界標杆。</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="section showcase-section animate-item">
+        <div class="showcase-info">
+          <div class="section-header">
+            <span class="section-label" data-i18n="showcaseLabel">特色亮點</span>
+            <h2 data-i18n="showcaseTitle">連接全球、推動學術卓越</h2>
+          </div>
+          <p data-i18n="showcaseText">將國際視野融入學術運營，透過精密的專案管理與創意的溝通策略，打造聯接校園與國際社群的橋樑。</p>
+        </div>
+        <div class="showcase-grid">
+          <article class="showcase-card">
+            <h3 data-i18n="showcaseCard1Title">國際交流平台</h3>
+            <p data-i18n="showcaseCard1Text">規劃與執行高規格國際學術研討會，匯聚全球 500+ 研究者，建立跨域知識共享生態。</p>
+          </article>
+          <article class="showcase-card">
+            <h3 data-i18n="showcaseCard2Title">多邊協議系統</h3>
+            <p data-i18n="showcaseCard2Text">建立標準化國際合作框架，簡化簽約流程，目前管理 40+ 所海外姐妹校、120+ 項交流計畫。</p>
+          </article>
+          <article class="showcase-card">
+            <h3 data-i18n="showcaseCard3Title">人才發展生態</h3>
+            <p data-i18n="showcaseCard3Text">設計完整學生職涯培育方案，連結企業夥伴與校友資源，培育 300+ 畢業生進入國際組織與跨國企業。</p>
+          </article>
+        </div>
+      </section>
+
+      <section id="contact" class="section contact-section animate-item">
+        <div class="contact-panel">
+          <div class="section-header">
+            <span class="section-label" data-i18n="contactLabel">聯絡我</span>
+            <h2 data-i18n="contactTitle">期待與您共同推動國際教育合作與學術創新</h2>
+          </div>
+          <div class="contact-cards">
+            <div class="contact-card">
+              <h3 data-i18n="contactCard1Title">電子郵件</h3>
+              <a href="mailto:claudia.chen@example.com">claudia123@tmu.edu.tw</a>
+            </div>
+            <div class="contact-card">
+              <h3 data-i18n="contactCard2Title">手機</h3>
+              <a href="tel:+886912345678">+886 912 345 678</a>
+            </div>
+            <div class="contact-card">
+              <h3 data-i18n="contactCard3Title">社群</h3>
+              <div class="social-links">
+                <a href="#" aria-label="LinkedIn">LinkedIn</a>
+                <a href="#" aria-label="Behance">Behance</a>
+                <a href="#" aria-label="Dribbble">Dribbble</a>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="newsletter-card">
+          <h3 data-i18n="newsletterTitle">想要收到我的國際合作案例與教育洞察？</h3>
+          <p data-i18n="newsletterText">訂閱每月通訊，掌握全球高教趨勢、國際交流案例與創新專案進展。</p>
+          <form class="newsletter-form" onsubmit="return false;">
+            <input type="email" placeholder="youremail@example.com" aria-label="Email address" />
+            <button class="btn primary" data-i18n="newsletterBtn">訂閱</button>
+          </form>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    const translations = {
+      heroEyebrow: {
+        zh: "Hello, 我是",
+        en: "Hello, I'm"
+      },
+      heroSubtitle: {
+        zh: "研究所與國際事務協調專員",
+        en: "Graduate Program Manager & International Affairs Specialist"
+      },
+      heroAction1: {
+        zh: "立即聯絡",
+        en: "Contact me"
+      },
+      heroAction2: {
+        zh: "探索更多",
+        en: "Discover more"
+      },
+      heroMetric1: {
+        zh: "年教育運營經驗",
+        en: "years in academic management"
+      },
+      heroMetric2: {
+        zh: "項國際合作專案",
+        en: "international collaboration projects"
+      },
+      heroMetric3: {
+        zh: "所合作海外大學",
+        en: "partner universities worldwide"
+      },
+      aboutLabel: {
+        zh: "關於我",
+        en: "About me"
+      },
+      aboutTitle: {
+        zh: "在全球化時代，領導教育卓越與國際交流",
+        en: "Leading educational excellence and global collaboration in the era of internationalization"
+      },
+      aboutCard1Title: {
+        zh: "核心價值",
+        en: "Core values"
+      },
+      aboutCard1Text: {
+        zh: "透過有效的專案規劃與國際協調，打造橋樑連接不同文化與學術體系，創造包容且具有全球視野的教育生態。",
+        en: "Building bridges across cultures and academic systems through effective project management and international coordination to foster inclusive, globally-minded educational ecosystems."
+      },
+      aboutCard2Title: {
+        zh: "專業技能",
+        en: "Expertise"
+      },
+      aboutCard2Text: {
+        zh: "精通研究所招生與教學計畫管理、國際交流協議簽訂、跨領域團隊溝通，以及複雜專案時程控管與風險預防。",
+        en: "Mastering graduate recruitment, curriculum planning, international agreement negotiation, cross-functional team leadership, project scheduling, and risk management."
+      },
+      aboutCard3Title: {
+        zh: "今日靈感",
+        en: "Today's inspiration"
+      },
+      aboutCard3Text: {
+        zh: "以聯合國永續發展目標、國際高等教育倫理、與新興市場學術合作為靈感，推動具有社會影響力的教育創新。",
+        en: "Inspired by UN Sustainable Development Goals, international higher education ethics, and emerging market academic partnerships to drive socially impactful education innovation."
+      },
+      timeline1: {
+        zh: "獲得教育部國際合作獎，主持校院級研究所國際招生專案，拓展海外學生來源國家至 15 個。",
+        en: "Received Ministry of Education International Cooperation Award; led university-level graduate recruitment campaigns expanding student sources to 15 countries."
+      },
+      timeline2: {
+        zh: "協調簽署 8 份國際雙學位協議，成功推動 45 名學生進行跨境交流，受到 QS 世界大學排名表揚。",
+        en: "Coordinated 8 international dual-degree agreements; facilitated 45 students' cross-border exchanges; recognized by QS World University Rankings."
+      },
+      timeline3: {
+        zh: "主導校級國際事務改革計畫，導入數位化簽核與 AI 智能配對系統，效率提升 60%，成為業界標杆。",
+        en: "Led university-wide international affairs digital transformation; implemented AI-powered partnership matching system; achieved 60% efficiency gain; became industry benchmark."
+      },
+      showcaseLabel: {
+        zh: "特色亮點",
+        en: "Showcase"
+      },
+      showcaseTitle: {
+        zh: "連接全球、推動學術卓越",
+        en: "Connecting the world, advancing academic excellence"
+      },
+      showcaseText: {
+        zh: "將國際視野融入學術運營，透過精密的專案管理與創意的溝通策略，打造聯接校園與國際社群的橋樑。",
+        en: "Integrating international perspectives into academic operations through precision project management and creative communication strategies to bridge campus and global communities."
+      },
+      showcaseCard1Title: {
+        zh: "國際交流平台",
+        en: "International exchange platforms"
+      },
+      showcaseCard1Text: {
+        zh: "規劃與執行高規格國際學術研討會，匯聚全球 500+ 研究者，建立跨域知識共享生態。",
+        en: "Designing and executing premier international academic conferences; convening 500+ global researchers; establishing cross-disciplinary knowledge-sharing ecosystems."
+      },
+      showcaseCard2Title: {
+        zh: "多邊協議系統",
+        en: "Multilateral partnership systems"
+      },
+      showcaseCard2Text: {
+        zh: "建立標準化國際合作框架，簡化簽約流程，目前管理 40+ 所海外姐妹校、120+ 項交流計畫。",
+        en: "Establishing standardized international partnership frameworks; streamlined agreement processes; currently managing 40+ partner institutions and 120+ exchange programs."
+      },
+      showcaseCard3Title: {
+        zh: "人才發展生態",
+        en: "Talent development ecosystems"
+      },
+      showcaseCard3Text: {
+        zh: "設計完整學生職涯培育方案，連結企業夥伴與校友資源，培育 300+ 畢業生進入國際組織與跨國企業。",
+        en: "Designing comprehensive student career development programs; connecting corporate partners and alumni networks; guided 300+ graduates into international organizations and multinational enterprises."
+      },
+      contactLabel: {
+        zh: "聯絡我",
+        en: "Contact"
+      },
+      contactTitle: {
+        zh: "期待與您共同推動國際教育合作與學術創新",
+        en: "Let's collaborate on advancing international education partnerships and academic innovation"
+      },
+      contactCard1Title: {
+        zh: "電子郵件",
+        en: "Email"
+      },
+      contactCard2Title: {
+        zh: "手機",
+        en: "Phone"
+      },
+      contactCard3Title: {
+        zh: "社群",
+        en: "Social"
+      },
+      newsletterTitle: {
+        zh: "想要收到我的國際合作案例與教育洞察？",
+        en: "Want insights on international education partnerships and collaboration case studies?"
+      },
+      newsletterText: {
+        zh: "訂閱每月通訊，掌握全球高教趨勢、國際交流案例與創新專案進展。",
+        en: "Subscribe to monthly updates on global higher education trends, international collaboration case studies, and innovative project insights."
+      },
+      newsletterBtn: {
+        zh: "訂閱",
+        en: "Subscribe"
+      }
+    };
+
+    const i18nElements = document.querySelectorAll('[data-i18n]');
+    const langButtons = document.querySelectorAll('.lang-btn');
+    const themeToggle = document.getElementById('themeToggle');
+    const body = document.body;
+
+    function setLanguage(lang) {
+      document.documentElement.lang = lang === 'zh' ? 'zh-Hant' : 'en';
+      i18nElements.forEach(el => {
+        const key = el.dataset.i18n;
+        if (translations[key]) {
+          el.textContent = translations[key][lang];
+        }
+      });
+      langButtons.forEach(btn => btn.classList.toggle('active', btn.dataset.lang === lang));
+    }
+
+    function setTheme(theme) {
+      if (theme === 'dark') {
+        body.classList.add('dark');
+        themeToggle.textContent = '🌙';
+      } else {
+        body.classList.remove('dark');
+        themeToggle.textContent = '☀️';
+      }
+      localStorage.setItem('ccy-theme', theme);
+    }
+
+    function initTheme() {
+      const savedTheme = localStorage.getItem('ccy-theme');
+      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      setTheme(savedTheme || (prefersDark ? 'dark' : 'light'));
+    }
+
+    function initLanguage() {
+      const savedLang = localStorage.getItem('ccy-lang') || 'zh';
+      setLanguage(savedLang);
+    }
+
+    langButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const lang = btn.dataset.lang;
+        localStorage.setItem('ccy-lang', lang);
+        setLanguage(lang);
+      });
+    });
+
+    themeToggle.addEventListener('click', () => {
+      const nextTheme = body.classList.contains('dark') ? 'light' : 'dark';
+      setTheme(nextTheme);
+    });
+
+    function animateEntrance() {
+      // CSS animations are handled automatically
+    }
+
+    function revealOnScroll() {
+      const targets = document.querySelectorAll('.animate-item');
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.style.animationPlayState = 'running';
+            observer.unobserve(entry.target);
+          }
+        });
+      }, {
+        threshold: 0.2
+      });
+      targets.forEach(target => {
+        target.style.animationPlayState = 'paused';
+        observer.observe(target);
+      });
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      initLanguage();
+      initTheme();
+      animateEntrance();
+      revealOnScroll();
+    });
+  </script>
+</body>
+</html>
